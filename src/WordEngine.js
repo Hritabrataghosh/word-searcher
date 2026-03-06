@@ -122,5 +122,42 @@ const count = map[suf]
 return count<5 && count>0
 
 })
+}
+
+export function findBestTraps(words, suffixMap, size){
+
+const traps = []
+
+for(const word of words){
+
+if(word.length < size) continue
+
+const suf = word.slice(-size)
+
+const count = suffixMap[suf]
+
+if(count > 0 && count <= 7){
+
+traps.push({
+word,
+count
+})
 
 }
+
+}
+
+return traps.sort((a,b)=>{
+
+// prefer 5-7 first
+const scoreA = Math.abs(6-a.count)
+const scoreB = Math.abs(6-b.count)
+
+if(scoreA !== scoreB) return scoreA-scoreB
+
+return a.count-b.count
+
+})
+
+}
+
