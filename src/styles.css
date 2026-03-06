@@ -85,6 +85,7 @@ cursor:pointer;
 font-size:14px;
 padding:0;
 line-height:1;
+pointer-events:auto;
 }
 
 .clearBtn:hover{

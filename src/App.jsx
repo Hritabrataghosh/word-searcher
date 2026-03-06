@@ -1,111 +1,124 @@
-import { useEffect,useState } from "react"
-import { buildIndex,search,findTraps,findBestTraps } from "./WordEngine"
+import { useEffect, useState } from "react"
+import { buildIndex, search, findTraps, findBestTraps } from "./WordEngine"
 
-export default function App(){
+export default function App() {
 
-const [index,setIndex] = useState(null)
-const [validSet,setValidSet] = useState(new Set())
+const [index, setIndex] = useState(null)
+const [validSet, setValidSet] = useState(new Set())
 
-const [prefix,setPrefix] = useState("")
-const [suffix,setSuffix] = useState("")
+const [prefix, setPrefix] = useState("")
+const [suffix, setSuffix] = useState("")
 
-const [sortMode,setSortMode] = useState("shortest")
+const [sortMode, setSortMode] = useState("shortest")
 
-const [results,setResults] = useState([])
-const [trap2,setTrap2] = useState([])
-const [trap3,setTrap3] = useState([])
-const [trap4,setTrap4] = useState([])
-const [bestTraps,setBestTraps] = useState([])
+const [results, setResults] = useState([])
+const [trap2, setTrap2] = useState([])
+const [trap3, setTrap3] = useState([])
+const [trap4, setTrap4] = useState([])
+const [bestTraps, setBestTraps] = useState([])
+
+const [loading, setLoading] = useState(true)
 
 
-const [loading,setLoading] = useState(true)
+// =======================
+// LOAD DATASETS
+// =======================
 
-useEffect(()=>{
+useEffect(() => {
 
 Promise.all([
-fetch("/datasets/all_words.txt").then(r=>r.text()),
-fetch("/datasets/valid_words.txt").then(r=>r.text())
+fetch("/datasets/all_words.txt").then(r => r.text()),
+fetch("/datasets/valid_words.txt").then(r => r.text())
 ])
 
-.then(([allText,validText])=>{
+.then(([allText, validText]) => {
 
 const allWords = allText
 .split("\n")
-.map(w=>w.trim().toLowerCase())
-.filter(w=>/^[a-z]+$/.test(w))
+.map(w => w.trim().toLowerCase())
+.filter(w => /^[a-z]+$/.test(w))
 
 const validWords = new Set(
 validText
 .split("\n")
-.map(w=>w.trim().toLowerCase())
-.filter(w=>/^[a-z]+$/.test(w))
+.map(w => w.trim().toLowerCase())
+.filter(w => /^[a-z]+$/.test(w))
 )
 
 setValidSet(validWords)
 
 const idx = buildIndex(allWords)
-
 setIndex(idx)
 
 setLoading(false)
 
 })
+.catch(err => {
+console.error("Dataset load failed:", err)
+})
 
-},[])
+}, [])
 
 
+// =======================
+// SEARCH ENGINE
+// =======================
 
-useEffect(()=>{
+useEffect(() => {
 
-if(!index) return
+if (!index) return
 
-let r = search(index,prefix,suffix)
+let r = search(index, prefix, suffix)
 
-// traps use full dictionary
-setTrap2(findTraps(r,index.suffix2,2,index.allWords))
-setTrap3(findTraps(r,index.suffix3,3,index.allWords))
-setTrap4(findTraps(r,index.suffix4,4,index.allWords))
+// traps
+setTrap2(findTraps(r, index.suffix2, 2, index.allWords))
+setTrap3(findTraps(r, index.suffix3, 3, index.allWords))
+setTrap4(findTraps(r, index.suffix4, 4, index.allWords))
 
-const best = findBestTraps(r,index.suffix4,4,index.allWords)
+const best = findBestTraps(r, index.suffix4, 4, index.allWords)
 setBestTraps(best)
-// normal list = valid words only
+
+// valid word filtering
 let validResults = r.filter(w => validSet.size === 0 || validSet.has(w))
 
-// sorting
-if(sortMode==="shortest"){
+// sorting (copy array first)
+let sorted = [...validResults]
 
-validResults.sort((a,b)=>a.length-b.length)
-
+if (sortMode === "shortest") {
+sorted.sort((a, b) => a.length - b.length)
 }
 
-else if(sortMode==="longest"){
-
-validResults.sort((a,b)=>b.length-a.length)
-
+else if (sortMode === "longest") {
+sorted.sort((a, b) => b.length - a.length)
 }
 
-else if(sortMode==="alphabet"){
-
-validResults.sort()
-
+else if (sortMode === "alphabet") {
+sorted.sort()
 }
 
-setResults(validResults)
+setResults(sorted)
 
-},[prefix,suffix,index,sortMode,validSet])
+}, [prefix, suffix, index, sortMode, validSet])
 
 
-if(loading){
+// =======================
+// LOADING SCREEN
+// =======================
 
-return(
+if (loading) {
+return (
 <div className="app">
 <h1>Loading dictionaries...</h1>
 </div>
 )
-
 }
 
-return(
+
+// =======================
+// UI
+// =======================
+
+return (
 
 <div className="app">
 
@@ -118,32 +131,33 @@ return(
 <input
 placeholder="Starts with"
 value={prefix}
-onChange={e=>setPrefix(e.target.value.toLowerCase())}
+onChange={e => setPrefix(e.target.value.toLowerCase())}
 />
 
 {prefix && (
 <button
 className="clearBtn"
-onClick={()=>setPrefix("")}
+onClick={() => setPrefix("")}
 >
 x
 </button>
 )}
 
 </div>
+
 
 <div className="inputWrap">
 
 <input
 placeholder="Ends with"
 value={suffix}
-onChange={e=>setSuffix(e.target.value.toLowerCase())}
+onChange={e => setSuffix(e.target.value.toLowerCase())}
 />
 
 {suffix && (
 <button
 className="clearBtn"
-onClick={()=>setSuffix("")}
+onClick={() => setSuffix("")}
 >
 x
 </button>
@@ -151,10 +165,12 @@ x
 
 </div>
 
+
 <select
 value={sortMode}
-onChange={e=>setSortMode(e.target.value)}
+onChange={e => setSortMode(e.target.value)}
 >
+
 <option value="shortest">Shortest</option>
 <option value="longest">Longest</option>
 <option value="alphabet">Alphabetical</option>
@@ -162,6 +178,7 @@ onChange={e=>setSortMode(e.target.value)}
 </select>
 
 </div>
+
 
 <Section title="Normal Valid Words" words={results}/>
 <TrapSection title="Best Trap Words" words={bestTraps}/>
@@ -175,9 +192,14 @@ onChange={e=>setSortMode(e.target.value)}
 
 }
 
-function Section({title,words}){
 
-return(
+// =======================
+// WORD LIST SECTION
+// =======================
+
+function Section({ title, words }) {
+
+return (
 
 <div className="section">
 
@@ -185,7 +207,7 @@ return(
 
 <div className="wordlist">
 
-{words.slice(0,300).map(w=>(
+{words.slice(0, 300).map(w => (
 <span key={w}>{w}</span>
 ))}
 
@@ -198,9 +220,13 @@ return(
 }
 
 
-function TrapSection({title,words}){
+// =======================
+// TRAP SECTION
+// =======================
 
-return(
+function TrapSection({ title, words }) {
+
+return (
 
 <div className="section">
 
@@ -208,7 +234,7 @@ return(
 
 <div className="wordlist">
 
-{words.slice(0,100).map(w=>(
+{words.slice(0, 100).map(w => (
 <span key={w.word + w.count}>
 {w.word} ({w.count})
 </span>
@@ -221,5 +247,3 @@ return(
 )
 
 }
-
-
