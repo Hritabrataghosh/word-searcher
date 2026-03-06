@@ -1,65 +1,113 @@
-export function analyzeWords(words) {
+export function buildIndex(words){
 
-  const suffix2 = {}
-  const suffix3 = {}
-  const suffix4 = {}
+const prefixIndex = {}
+const suffixIndex = {}
 
-  for (let word of words) {
+const suffix2 = {}
+const suffix3 = {}
+const suffix4 = {}
 
-    if (word.length >= 2) {
+for(const word of words){
 
-      const s2 = word.slice(-2)
-      suffix2[s2] = (suffix2[s2] || 0) + 1
+// prefix index (first 1–5 letters)
 
-    }
+for(let i=1;i<=5;i++){
 
-    if (word.length >= 3) {
+if(word.length >= i){
 
-      const s3 = word.slice(-3)
-      suffix3[s3] = (suffix3[s3] || 0) + 1
+const p = word.slice(0,i)
 
-    }
+if(!prefixIndex[p]) prefixIndex[p] = []
+prefixIndex[p].push(word)
 
-    if (word.length >= 4) {
+}
 
-      const s4 = word.slice(-4)
-      suffix4[s4] = (suffix4[s4] || 0) + 1
+}
 
-    }
+// suffix index
 
-  }
+for(let i=1;i<=5;i++){
 
-  return { suffix2, suffix3, suffix4 }
+if(word.length >= i){
+
+const s = word.slice(-i)
+
+if(!suffixIndex[s]) suffixIndex[s] = []
+suffixIndex[s].push(word)
+
+}
+
+}
+
+// rarity maps
+
+if(word.length>=2){
+
+const s2 = word.slice(-2)
+suffix2[s2] = (suffix2[s2]||0)+1
+
+}
+
+if(word.length>=3){
+
+const s3 = word.slice(-3)
+suffix3[s3] = (suffix3[s3]||0)+1
+
+}
+
+if(word.length>=4){
+
+const s4 = word.slice(-4)
+suffix4[s4] = (suffix4[s4]||0)+1
+
+}
+
+}
+
+return {prefixIndex,suffixIndex,suffix2,suffix3,suffix4}
 
 }
 
 
-export function filterWords(words, prefix, suffix) {
 
-  return words.filter(word => {
+export function search(index,prefix,suffix){
 
-    if (prefix && !word.startsWith(prefix)) return false
-    if (suffix && !word.endsWith(suffix)) return false
+let results = []
 
-    return true
+if(prefix && index.prefixIndex[prefix]){
 
-  })
+results = index.prefixIndex[prefix]
+
+}else{
+
+results = Object.values(index.prefixIndex).flat()
+
+}
+
+if(suffix){
+
+results = results.filter(w=>w.endsWith(suffix))
+
+}
+
+return results
 
 }
 
 
-export function findTraps(words, suffixMap, size) {
 
-  return words.filter(word => {
+export function findTraps(words,map,size){
 
-    if (word.length < size) return false
+return words.filter(w=>{
 
-    const suf = word.slice(-size)
+if(w.length<size) return false
 
-    const count = suffixMap[suf]
+const suf = w.slice(-size)
 
-    return count < 5 && count > 0
+const count = map[suf]
 
-  })
+return count<5 && count>0
+
+})
 
 }
