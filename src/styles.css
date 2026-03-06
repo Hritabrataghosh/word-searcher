@@ -61,3 +61,27 @@ width:100%;
 }
 
 }
+.inputWrap{
+position:relative;
+display:inline-block;
+}
+
+.inputWrap input{
+padding-right:28px;
+}
+
+.clearBtn{
+position:absolute;
+right:6px;
+top:50%;
+transform:translateY(-50%);
+border:none;
+background:none;
+cursor:pointer;
+font-size:16px;
+opacity:0.6;
+}
+
+.clearBtn:hover{
+opacity:1;
+}

@@ -113,11 +113,26 @@ return(
 
 <div className="controls">
 
+<div className="inputWrap">
+
 <input
 placeholder="Starts with"
 value={prefix}
 onChange={e=>setPrefix(e.target.value.toLowerCase())}
 />
+
+{prefix && (
+<button
+className="clearBtn"
+onClick={()=>setPrefix("")}
+>
+✕
+</button>
+)}
+
+</div>
+
+<div className="inputWrap">
 
 <input
 placeholder="Ends with"
@@ -125,11 +140,21 @@ value={suffix}
 onChange={e=>setSuffix(e.target.value.toLowerCase())}
 />
 
+{suffix && (
+<button
+className="clearBtn"
+onClick={()=>setSuffix("")}
+>
+✕
+</button>
+)}
+
+</div>
+
 <select
 value={sortMode}
 onChange={e=>setSortMode(e.target.value)}
 >
-
 <option value="shortest">Shortest</option>
 <option value="longest">Longest</option>
 <option value="alphabet">Alphabetical</option>
