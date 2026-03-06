@@ -64,29 +64,42 @@ suffix4[s4] = (suffix4[s4]||0)+1
 
 }
 
-return {prefixIndex,suffixIndex,suffix2,suffix3,suffix4}
+return {
+allWords: words,
+prefixIndex,
+suffixIndex,
+suffix2,
+suffix3,
+suffix4
+}
 
 }
 
 
 
-export function search(index,prefix,suffix){
+export function search(index, prefix, suffix){
 
 let results = []
 
-if(prefix && index.prefixIndex[prefix]){
+// start with all words
+if(!prefix){
+
+results = index.allWords
+
+}else if(index.prefixIndex[prefix]){
 
 results = index.prefixIndex[prefix]
 
 }else{
 
-results = Object.values(index.prefixIndex).flat()
+results = []
 
 }
 
+// suffix filter
 if(suffix){
 
-results = results.filter(w=>w.endsWith(suffix))
+results = results.filter(w => w.endsWith(suffix))
 
 }
 

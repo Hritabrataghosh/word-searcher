@@ -47,15 +47,15 @@ if(!index) return
 
 const r = search(index,prefix,suffix)
 
-// sort by smallest words first
+// traps should use original results
+setTrap2(findTraps(r,index.suffix2,2))
+setTrap3(findTraps(r,index.suffix3,3))
+setTrap4(findTraps(r,index.suffix4,4))
+
+// only sort the normal results
 const sorted = [...r].sort((a,b)=>a.length-b.length)
 
 setResults(sorted)
-
-setTrap2(findTraps(sorted,index.suffix2,2))
-setTrap3(findTraps(sorted,index.suffix3,3))
-setTrap4(findTraps(sorted,index.suffix4,4))
-
 },[prefix,suffix,index])
 
 
