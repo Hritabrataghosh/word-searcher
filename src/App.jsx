@@ -71,11 +71,11 @@ if (!index) return
 let r = search(index, prefix, suffix)
 
 // traps
-setTrap2(findTraps(r, index.suffix2, 2, index.allWords))
-setTrap3(findTraps(r, index.suffix3, 3, index.allWords))
-setTrap4(findTraps(r, index.suffix4, 4, index.allWords))
+setTrap2(findTraps(r,index.suffix2,2,index.allWords,index.wordSet))
+setTrap3(findTraps(r,index.suffix3,3,index.allWords,index.wordSet))
+setTrap4(findTraps(r,index.suffix4,4,index.allWords,index.wordSet))
 
-const best = findBestTraps(r, index.suffix4, 4, index.allWords)
+const best = findBestTraps(r,index.suffix4,4,index.allWords,index.wordSet)
 setBestTraps(best)
 
 // valid word filtering

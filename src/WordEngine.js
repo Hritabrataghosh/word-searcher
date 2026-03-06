@@ -2,14 +2,15 @@
 // TRIE STRUCTURE (FAST PREFIX SEARCH)
 // ==============================
 
-class TrieNode {
+class TrieNode{
 constructor(){
 this.children = {}
 this.words = []
 }
 }
 
-class Trie {
+class Trie{
+
 constructor(){
 this.root = new TrieNode()
 }
@@ -62,35 +63,42 @@ const suffix2 = {}
 const suffix3 = {}
 const suffix4 = {}
 
+const wordSet = new Set(words) // FAST LOOKUP
+
 for(const word of words){
 
 trie.insert(word)
 
-// suffix rarity maps
-
 if(word.length >= 2){
+
 const s2 = word.slice(-2)
 suffix2[s2] = (suffix2[s2] || 0) + 1
+
 }
 
 if(word.length >= 3){
+
 const s3 = word.slice(-3)
 suffix3[s3] = (suffix3[s3] || 0) + 1
+
 }
 
 if(word.length >= 4){
+
 const s4 = word.slice(-4)
 suffix4[s4] = (suffix4[s4] || 0) + 1
-}
 
 }
 
-return {
+}
+
+return{
 trie,
 suffix2,
 suffix3,
 suffix4,
-allWords: words
+allWords: words,
+wordSet
 }
 
 }
@@ -107,12 +115,13 @@ let results = []
 
 if(prefix){
 results = index.trie.search(prefix)
-}else{
+}
+else{
 results = index.allWords
 }
 
 if(suffix){
-results = results.filter(w => w.endsWith(suffix))
+results = results.filter(w=>w.endsWith(suffix))
 }
 
 return results
@@ -125,7 +134,7 @@ return results
 // TRAP DETECTION
 // ==============================
 
-export function findTraps(words,map,size,allWords){
+export function findTraps(words,map,size,allWords,wordSet){
 
 return words.filter(w=>{
 
@@ -135,7 +144,7 @@ const suf = w.slice(-size)
 const count = map[suf]
 
 // remove traps where suffix itself is a word
-if(allWords.includes(suf)) return false
+if(wordSet.has(suf)) return false
 
 return count < 5 && count > 0
 
@@ -149,7 +158,7 @@ return count < 5 && count > 0
 // BEST TRAP FINDER
 // ==============================
 
-export function findBestTraps(words,suffixMap,size,allWords){
+export function findBestTraps(words,suffixMap,size,allWords,wordSet){
 
 const traps = []
 
@@ -161,7 +170,7 @@ const suf = word.slice(-size)
 const count = suffixMap[suf]
 
 // remove traps where suffix itself is a word
-if(allWords.includes(suf)) continue
+if(wordSet.has(suf)) continue
 
 if(count > 0 && count <= 7){
 
@@ -175,8 +184,6 @@ count
 }
 
 return traps.sort((a,b)=>{
-
-// prefer counts near 6 (best trap zone)
 
 const scoreA = Math.abs(6 - a.count)
 const scoreB = Math.abs(6 - b.count)
