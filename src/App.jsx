@@ -38,6 +38,7 @@ const validWords = new Set(
 validText
 .split("\n")
 .map(w=>w.trim().toLowerCase())
+.filter(w=>/^[a-z]+$/.test(w))
 )
 
 setValidSet(validWords)
@@ -68,7 +69,7 @@ setTrap4(findTraps(r,index.suffix4,4))
 const best = findBestTraps(r,index.suffix4,4)
 setBestTraps(best)
 // normal list = valid words only
-let validResults = r.filter(w=>validSet.has(w))
+let validResults = r.filter(w => validSet.size === 0 || validSet.has(w))
 
 // sorting
 if(sortMode==="shortest"){
