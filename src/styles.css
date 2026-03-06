@@ -64,8 +64,6 @@ width:100%;
 .inputWrap{
 position:relative;
 flex:1;
-display:flex;
-align-items:center;
 }
 
 .inputWrap input{
@@ -79,13 +77,16 @@ right:8px;
 top:50%;
 transform:translateY(-50%);
 border:none;
-background:transparent;
-color:#888;
+background:#1e293b;
+color:white;
+width:18px;
+height:18px;
+border-radius:50%;
+font-size:12px;
 cursor:pointer;
-font-size:14px;
-padding:0;
-line-height:1;
-pointer-events:auto;
+display:flex;
+align-items:center;
+justify-content:center;
 }
 
 .clearBtn:hover{
