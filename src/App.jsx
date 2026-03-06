@@ -126,7 +126,7 @@ onChange={e=>setPrefix(e.target.value.toLowerCase())}
 className="clearBtn"
 onClick={()=>setPrefix("")}
 >
-✕
+x
 </button>
 )}
 
@@ -145,7 +145,7 @@ onChange={e=>setSuffix(e.target.value.toLowerCase())}
 className="clearBtn"
 onClick={()=>setSuffix("")}
 >
-✕
+x
 </button>
 )}
 
@@ -209,7 +209,7 @@ return(
 <div className="wordlist">
 
 {words.slice(0,100).map(w=>(
-<span key={w.word}>
+<span key={w.word + w.count}>
 {w.word} ({w.count})
 </span>
 ))}
