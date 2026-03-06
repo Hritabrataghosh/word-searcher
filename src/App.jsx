@@ -1,121 +1,107 @@
 import { useEffect, useState } from "react"
-
 import { analyzeWords, filterWords, findTraps } from "./WordEngine"
 
+export default function App(){
 
-export default function App() {
+const [words,setWords] = useState([])
+const [prefix,setPrefix] = useState("")
+const [suffix,setSuffix] = useState("")
 
-  const [words, setWords] = useState([])
+const [engine,setEngine] = useState(null)
 
-  const [prefix, setPrefix] = useState("")
-  const [suffix, setSuffix] = useState("")
+const [results,setResults] = useState([])
+const [trap2,setTrap2] = useState([])
+const [trap3,setTrap3] = useState([])
+const [trap4,setTrap4] = useState([])
 
-  const [engine, setEngine] = useState(null)
+useEffect(()=>{
 
-  const [results, setResults] = useState([])
-  const [trap2, setTrap2] = useState([])
-  const [trap3, setTrap3] = useState([])
-  const [trap4, setTrap4] = useState([])
+fetch("/words.txt")
+fetch("/datasets/all_words.txt")
+.then(r=>r.text())
+.then(text=>{
 
+const list = text
+.split("\n")
+.map(w=>w.trim())
+.filter(Boolean)
 
-  useEffect(() => {
+setWords(list)
 
-    fetch("/words.txt")
+const data = analyzeWords(list)
+setEngine(data)
 
-      .then(res => res.text())
+})
 
-      .then(text => {
-
-        const list = text.split("\n")
-
-        setWords(list)
-
-        const analysis = analyzeWords(list)
-
-        setEngine(analysis)
-
-      })
-
-  }, [])
+},[])
 
 
+useEffect(()=>{
 
-  function runSearch() {
+if(!engine) return
 
-    if (!engine) return
+const filtered = filterWords(words,prefix,suffix)
 
-    const filtered = filterWords(words, prefix, suffix)
+setResults(filtered)
 
-    setResults(filtered)
+setTrap2(findTraps(filtered,engine.suffix2,2))
+setTrap3(findTraps(filtered,engine.suffix3,3))
+setTrap4(findTraps(filtered,engine.suffix4,4))
 
-    setTrap2(findTraps(filtered, engine.suffix2, 2))
-    setTrap3(findTraps(filtered, engine.suffix3, 3))
-    setTrap4(findTraps(filtered, engine.suffix4, 4))
-
-  }
-
-
-  return (
-
-    <div className="app">
-
-      <h1>Word Trap Finder</h1>
-
-      <div className="controls">
-
-        <input
-          placeholder="Starts with (ex: ly)"
-          value={prefix}
-          onChange={e => setPrefix(e.target.value)}
-        />
-
-        <input
-          placeholder="Ends with (ex: ly)"
-          value={suffix}
-          onChange={e => setSuffix(e.target.value)}
-        />
-
-        <button onClick={runSearch}>Search</button>
-
-      </div>
+},[prefix,suffix,engine])
 
 
-      <Section title="Normal Results" words={results} />
+return(
 
-      <Section title="2 Letter Trap" words={trap2} />
+<div className="app">
 
-      <Section title="3 Letter Trap" words={trap3} />
+<h1>Word Trap Finder</h1>
 
-      <Section title="4 Letter Trap" words={trap4} />
+<div className="controls">
 
-    </div>
+<input
+placeholder="Starts with"
+value={prefix}
+onChange={e=>setPrefix(e.target.value.toLowerCase())}
+/>
 
-  )
+<input
+placeholder="Ends with"
+value={suffix}
+onChange={e=>setSuffix(e.target.value.toLowerCase())}
+/>
+
+</div>
+
+<Section title="Normal Results" words={results}/>
+<Section title="2 Letter Trap" words={trap2}/>
+<Section title="3 Letter Trap" words={trap3}/>
+<Section title="4 Letter Trap" words={trap4}/>
+
+</div>
+
+)
 
 }
 
+function Section({title,words}){
 
+return(
 
-function Section({ title, words }) {
+<div className="section">
 
-  return (
+<h2>{title} ({words.length})</h2>
 
-    <div className="section">
+<div className="wordlist">
 
-      <h2>{title} ({words.length})</h2>
+{words.slice(0,300).map(w=>
+<span key={w}>{w}</span>
+)}
 
-      <div className="wordlist">
+</div>
 
-        {words.slice(0, 500).map(word => (
+</div>
 
-          <span key={word}>{word}</span>
-
-        ))}
-
-      </div>
-
-    </div>
-
-  )
+)
 
 }
