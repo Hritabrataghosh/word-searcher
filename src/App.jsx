@@ -62,11 +62,11 @@ if(!index) return
 let r = search(index,prefix,suffix)
 
 // traps use full dictionary
-setTrap2(findTraps(r,index.suffix2,2))
-setTrap3(findTraps(r,index.suffix3,3))
-setTrap4(findTraps(r,index.suffix4,4))
+setTrap2(findTraps(r,index.suffix2,2,index.allWords))
+setTrap3(findTraps(r,index.suffix3,3,index.allWords))
+setTrap4(findTraps(r,index.suffix4,4,index.allWords))
 
-const best = findBestTraps(r,index.suffix4,4)
+const best = findBestTraps(r,index.suffix4,4,index.allWords)
 setBestTraps(best)
 // normal list = valid words only
 let validResults = r.filter(w => validSet.size === 0 || validSet.has(w))

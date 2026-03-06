@@ -136,7 +136,7 @@ return results
 // TRAP DETECTION
 // ==============================
 
-export function findTraps(words,map,size){
+export function findTraps(words,map,size,allWords){
 
 return words.filter(w=>{
 
@@ -146,8 +146,8 @@ const suf = w.slice(-size)
 
 const count = map[suf]
 
-// exclude traps where suffix itself is a word
-if(words.includes(suf)) return false
+// remove traps where suffix itself is a word
+if(allWords.includes(suf)) return false
 
 return count < 5 && count > 0
 
@@ -161,7 +161,7 @@ return count < 5 && count > 0
 // BEST TRAP FINDER
 // ==============================
 
-export function findBestTraps(words, suffixMap, size){
+export function findBestTraps(words,suffixMap,size,allWords){
 
 const traps = []
 
@@ -173,8 +173,8 @@ const suf = word.slice(-size)
 
 const count = suffixMap[suf]
 
-// skip if suffix itself is a word
-if(words.includes(suf)) continue
+// remove traps where suffix itself is a word
+if(allWords.includes(suf)) continue
 
 if(count > 0 && count <= 7){
 
@@ -189,12 +189,12 @@ count
 
 return traps.sort((a,b)=>{
 
-const scoreA = Math.abs(6 - a.count)
-const scoreB = Math.abs(6 - b.count)
+const scoreA = Math.abs(6-a.count)
+const scoreB = Math.abs(6-b.count)
 
-if(scoreA !== scoreB) return scoreA - scoreB
+if(scoreA !== scoreB) return scoreA-scoreB
 
-return a.count - b.count
+return a.count-b.count
 
 })
 
