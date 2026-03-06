@@ -4,9 +4,12 @@ import { buildIndex,search,findTraps } from "./WordEngine"
 export default function App(){
 
 const [index,setIndex] = useState(null)
+const [validSet,setValidSet] = useState(new Set())
 
 const [prefix,setPrefix] = useState("")
 const [suffix,setSuffix] = useState("")
+
+const [sortMode,setSortMode] = useState("shortest")
 
 const [results,setResults] = useState([])
 const [trap2,setTrap2] = useState([])
@@ -17,53 +20,81 @@ const [loading,setLoading] = useState(true)
 
 useEffect(()=>{
 
-fetch("/datasets/all_words.txt")
+Promise.all([
+fetch("/datasets/all_words.txt").then(r=>r.text()),
+fetch("/datasets/valid_words.txt").then(r=>r.text())
+])
 
-.then(r=>r.text())
+.then(([allText,validText])=>{
 
-.then(text=>{
-
-const words = text
+const allWords = allText
 .split("\n")
-.map(w => w.trim().toLowerCase())
-.filter(w => /^[a-z]+$/.test(w))
+.map(w=>w.trim().toLowerCase())
+.filter(w=>/^[a-z]+$/.test(w))
 
-const idx = buildIndex(words)
+const validWords = new Set(
+validText
+.split("\n")
+.map(w=>w.trim().toLowerCase())
+)
+
+setValidSet(validWords)
+
+const idx = buildIndex(allWords)
 
 setIndex(idx)
 
 setLoading(false)
-
-console.log("Indexed words:", words.length)
 
 })
 
 },[])
 
 
+
 useEffect(()=>{
 
 if(!index) return
 
-const r = search(index,prefix,suffix)
+let r = search(index,prefix,suffix)
 
-// traps should use original results
+// traps use full dictionary
 setTrap2(findTraps(r,index.suffix2,2))
 setTrap3(findTraps(r,index.suffix3,3))
 setTrap4(findTraps(r,index.suffix4,4))
 
-// only sort the normal results
-const sorted = [...r].sort((a,b)=>a.length-b.length)
+// normal list = valid words only
+let validResults = r.filter(w=>validSet.has(w))
 
-setResults(sorted)
-},[prefix,suffix,index])
+// sorting
+if(sortMode==="shortest"){
+
+validResults.sort((a,b)=>a.length-b.length)
+
+}
+
+else if(sortMode==="longest"){
+
+validResults.sort((a,b)=>b.length-a.length)
+
+}
+
+else if(sortMode==="alphabet"){
+
+validResults.sort()
+
+}
+
+setResults(validResults)
+
+},[prefix,suffix,index,sortMode,validSet])
 
 
 if(loading){
 
 return(
 <div className="app">
-<h1>Building Word Index...</h1>
+<h1>Loading dictionaries...</h1>
 </div>
 )
 
@@ -89,9 +120,20 @@ value={suffix}
 onChange={e=>setSuffix(e.target.value.toLowerCase())}
 />
 
+<select
+value={sortMode}
+onChange={e=>setSortMode(e.target.value)}
+>
+
+<option value="shortest">Shortest</option>
+<option value="longest">Longest</option>
+<option value="alphabet">Alphabetical</option>
+
+</select>
+
 </div>
 
-<Section title="Normal Results" words={results}/>
+<Section title="Normal Valid Words" words={results}/>
 <Section title="2 Letter Trap" words={trap2}/>
 <Section title="3 Letter Trap" words={trap3}/>
 <Section title="4 Letter Trap" words={trap4}/>
@@ -101,7 +143,6 @@ onChange={e=>setSuffix(e.target.value.toLowerCase())}
 )
 
 }
-
 
 
 function Section({title,words}){
