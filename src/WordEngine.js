@@ -3,16 +3,13 @@
 // ==============================
 
 class TrieNode {
-
 constructor(){
 this.children = {}
 this.words = []
 }
-
 }
 
 class Trie {
-
 constructor(){
 this.root = new TrieNode()
 }
@@ -28,7 +25,6 @@ node.children[char] = new TrieNode()
 }
 
 node = node.children[char]
-
 node.words.push(word)
 
 }
@@ -42,7 +38,6 @@ let node = this.root
 for(const char of prefix){
 
 if(!node.children[char]) return []
-
 node = node.children[char]
 
 }
@@ -74,24 +69,18 @@ trie.insert(word)
 // suffix rarity maps
 
 if(word.length >= 2){
-
 const s2 = word.slice(-2)
 suffix2[s2] = (suffix2[s2] || 0) + 1
-
 }
 
 if(word.length >= 3){
-
 const s3 = word.slice(-3)
 suffix3[s3] = (suffix3[s3] || 0) + 1
-
 }
 
 if(word.length >= 4){
-
 const s4 = word.slice(-4)
 suffix4[s4] = (suffix4[s4] || 0) + 1
-
 }
 
 }
@@ -123,7 +112,7 @@ results = index.allWords
 }
 
 if(suffix){
-results = results.filter(w=>w.endsWith(suffix))
+results = results.filter(w => w.endsWith(suffix))
 }
 
 return results
@@ -143,7 +132,6 @@ return words.filter(w=>{
 if(w.length < size) return false
 
 const suf = w.slice(-size)
-
 const count = map[suf]
 
 // remove traps where suffix itself is a word
@@ -170,7 +158,6 @@ for(const word of words){
 if(word.length < size) continue
 
 const suf = word.slice(-size)
-
 const count = suffixMap[suf]
 
 // remove traps where suffix itself is a word
@@ -189,21 +176,6 @@ count
 
 return traps.sort((a,b)=>{
 
-const scoreA = Math.abs(6-a.count)
-const scoreB = Math.abs(6-b.count)
-
-if(scoreA !== scoreB) return scoreA-scoreB
-
-return a.count-b.count
-
-})
-
-}
-
-
-
-return traps.sort((a,b)=>{
-
 // prefer counts near 6 (best trap zone)
 
 const scoreA = Math.abs(6 - a.count)
@@ -215,3 +187,4 @@ return a.count - b.count
 
 })
 
+}
