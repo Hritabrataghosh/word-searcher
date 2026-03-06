@@ -25,8 +25,8 @@ fetch("/datasets/all_words.txt")
 
 const words = text
 .split("\n")
-.map(w=>w.trim().toLowerCase())
-.filter(Boolean)
+.map(w => w.trim().toLowerCase())
+.filter(w => /^[a-z]+$/.test(w))
 
 const idx = buildIndex(words)
 
@@ -34,7 +34,7 @@ setIndex(idx)
 
 setLoading(false)
 
-console.log("Indexed words:",words.length)
+console.log("Indexed words:", words.length)
 
 })
 
