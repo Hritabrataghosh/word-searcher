@@ -1,5 +1,5 @@
 import { useEffect,useState } from "react"
-import { buildIndex,search,findTraps } from "./WordEngine"
+import { buildIndex,search,findTraps,findBestTraps } from "./WordEngine"
 
 export default function App(){
 
@@ -15,6 +15,8 @@ const [results,setResults] = useState([])
 const [trap2,setTrap2] = useState([])
 const [trap3,setTrap3] = useState([])
 const [trap4,setTrap4] = useState([])
+const [bestTraps,setBestTraps] = useState([])
+
 
 const [loading,setLoading] = useState(true)
 
@@ -63,6 +65,8 @@ setTrap2(findTraps(r,index.suffix2,2))
 setTrap3(findTraps(r,index.suffix3,3))
 setTrap4(findTraps(r,index.suffix4,4))
 
+const best = findBestTraps(r,index.suffix4,4)
+setBestTraps(best)
 // normal list = valid words only
 let validResults = r.filter(w=>validSet.has(w))
 
@@ -134,6 +138,7 @@ onChange={e=>setSortMode(e.target.value)}
 </div>
 
 <Section title="Normal Valid Words" words={results}/>
+<TrapSection title="Best Trap Words" words={bestTraps}/>
 <Section title="2 Letter Trap" words={trap2}/>
 <Section title="3 Letter Trap" words={trap3}/>
 <Section title="4 Letter Trap" words={trap4}/>
@@ -143,7 +148,6 @@ onChange={e=>setSortMode(e.target.value)}
 )
 
 }
-
 
 function Section({title,words}){
 
@@ -166,3 +170,30 @@ return(
 )
 
 }
+
+
+function TrapSection({title,words}){
+
+return(
+
+<div className="section">
+
+<h2>{title}</h2>
+
+<div className="wordlist">
+
+{words.slice(0,100).map(w=>(
+<span key={w.word}>
+{w.word} ({w.count})
+</span>
+))}
+
+</div>
+
+</div>
+
+)
+
+}
+
+
